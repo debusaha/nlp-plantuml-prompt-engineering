@@ -1,61 +1,26 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional
-import os
-from plantuml import PlantUML
-from transformers import T5Tokenizer, T5ForConditionalGeneration
+# Assuming plantuml_code_generated contains the output from the model
+example_description = plantuml_code_generated
 
-# Define the request body
-class Scenario(BaseModel):
-    text: str
+def generate_and_display_plantuml(description, model, tokenizer, device, max_length=512):
+    # Tokenize and generate output
+    inputs = tokenizer(description, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(device)
+    output_ids = model.generate(inputs['input_ids'], attention_mask=inputs['attention_mask'], max_length=max_length)
+    plantuml_code = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+    
+    # Ensure '@enduml' is present
+    if '@enduml' not in plantuml_code:
+        plantuml_code += '\n@enduml'
+    
+    # Write to file and generate diagram
+    with open('diagram.puml', 'w') as file:
+        file.write(plantuml_code)
+    
+    # Generate the diagram using PlantUML server
+    !java -jar plantuml.jar diagram.puml
+    
+    # Display the diagram
+    from IPython.display import Image
+    display(Image(filename='diagram.png'))
 
-app = FastAPI()
-
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Load the trained model and tokenizer
-model = T5ForConditionalGeneration.from_pretrained("debusaha/t5-base-plantuml")
-tokenizer = T5Tokenizer.from_pretrained("t5-base")
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to my FastAPI application!"}
-
-@app.post("/generate")
-async def generate_diagram(scenario: Scenario):
-    # Generate PlantUML code from the scenario
-    plantuml_code = generate_plantuml_code(scenario.text)
-
-    # Convert PlantUML code into an image
-    image_path = convert_to_image(plantuml_code)
-
-    # Return the image path
-    return {"image_path": image_path}
-
-def generate_plantuml_code(scenario):
-    # Encode the scenario and generate the PlantUML code
-    inputs = tokenizer.encode("generate code: " + scenario.text, return_tensors="pt")
-    outputs = model.generate(inputs, max_length=150, num_beams=4, early_stopping=True)
-    plantuml_code = tokenizer.decode(outputs[0])
-
-    return plantuml_code
-
-def convert_to_image(plantuml_code):
-    # Write the PlantUML code to a file
-    with open("diagram.uml", "w") as f:
-        f.write(plantuml_code)
-
-    # Convert the PlantUML code into an image
-    puml = PlantUML(url='http://www.plantuml.com/plantuml/img/')
-    image_path = puml.processes_file('diagram.uml')
-
-    # Return the image path
-    return image_path
+# Now call the function with the output from the model
+generate_and_display_plantuml(example_description, model, tokenizer, device)
