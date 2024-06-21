@@ -4,10 +4,12 @@ from pydantic import BaseModel
 from transformers import T5Tokenizer, AutoModelForSeq2SeqLM
 import subprocess
 import os
+import base64
+
 
 # Define the request body
 
-class Senario(BaseModel):
+class Scenario(BaseModel):
     text: str
     
 
@@ -23,8 +25,8 @@ app.add_middleware(
 )
 
 # Load the trained model and tokenizer
-model = AutoModelForSeq2SeqLM.from_pretrained("debusaha/T5-large_plantumlcode_v3 ")
-tokenizer= T5Tokenizer.from_pretrained("debusaha/T5-large_plantumlcode_v3 ")
+model = AutoModelForSeq2SeqLM.from_pretrained("debusaha/T5-large_plantumlcode_v3")
+tokenizer= T5Tokenizer.from_pretrained("debusaha/T5-large_plantumlcode_v3")
 
 @app.post("/generate")
 async def generate_diagram(scenario: Scenario):
