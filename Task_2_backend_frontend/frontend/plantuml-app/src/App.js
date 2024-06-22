@@ -6,7 +6,7 @@ class App extends React.Component {
         super(props);
         this.state = {
             scenario: '',
-            image: null,
+            plantumlCode: '',
         };
     }
 
@@ -25,7 +25,7 @@ class App extends React.Component {
         });
 
         this.setState({
-            image: response.data.image_path,
+            plantumlCode: response.data.plantuml_code,
         });
     };
 
@@ -39,7 +39,7 @@ class App extends React.Component {
                     </label>
                     <input type="submit" value="Generate" />
                 </form>
-                {this.state.image && <img src={this.state.image} alt="Generated diagram" />}
+                {this.state.plantumlCode && <textarea readOnly value={this.state.plantumlCode} />}
             </div>
         );
     }
