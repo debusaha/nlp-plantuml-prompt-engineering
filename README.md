@@ -1,9 +1,6 @@
-# AI Engineering / Prompt Engineering
+# AI Engineering / Prompt Engineering Project Overview
 
-The repository pertains to the AI Engineering / Prompt Engineering applications, involving the training of a Large Language Model (LLM) for PlantUML code generation and the creation of a backend service using FastAPI, along with a ReactJS frontend to visualize the diagrams.
-
-# Project Overview
-This repository is for 
+The repository pertains to the AI Engineering / Prompt Engineering applications, involving the training of Large Language Models (LLMs) for PlantUML code generation and the creation of a backend service using FastAPI, along with a ReactJS frontend to visualize the diagrams.
 
 ## Dataset
 The dataset for this project is hosted on Hugging Face. You can find it at `coai/plantuml_generation`.
